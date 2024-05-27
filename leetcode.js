@@ -28,7 +28,7 @@ function getLCUserProfile() {
                 }
             }
         `,
-            variables: { userSlug: "WenjieGao" },
+            variables: { userSlug: "YOUR_USER_NAME" },
             operationName: "userProfileUserQuestionProgressV2"
         })
     })
