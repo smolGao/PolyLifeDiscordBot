@@ -1,4 +1,4 @@
-class Land { 
+class Map { 
 
     constructor () {
         this.name;
