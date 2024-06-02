@@ -18,8 +18,6 @@ client.on('messageCreate', async message => {
     // Extract the command and arguments from the message
     const [command, ...args] = message.content.slice(1).trim().split(/\s+/);
 
-    // Check if the message is for bot
-
     // Check if the command is '!leetcode' followed by a username
     if (command === 'leetcode' && args.length === 1) {
         const username = args[0];
