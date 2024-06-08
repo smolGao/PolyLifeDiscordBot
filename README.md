@@ -8,6 +8,3 @@ https://docs.google.com/document/d/1aeDWsdFyx7DJ9rL2QRh4xMxGQ_t8ri2KMw88QsCYmGg/
 
 Link to Google Drive: 
 https://drive.google.com/drive/folders/1lSxK73tEIldUkgTiJbMMdy9eGge-Nu1T?usp=drive_link
-
-Flowchart:
-![flowchart](https://github.com/smolGao/PolyLifeDiscordBot/assets/108559852/15d5a457-82d4-4f6d-84f4-d201ab9de24a)
