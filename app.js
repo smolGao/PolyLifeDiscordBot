@@ -4,6 +4,9 @@ const fs = require('node:fs');
 const path = require('node:path');
 const { Client, Collection, Events, GatewayIntentBits } = require('discord.js');
 
+const TOKEN = process.env.TOKEN;
+
+
 const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent] });
 client.commands = new Collection();
 
@@ -25,7 +28,6 @@ for (const folder of commandFolders) {
 	}
 }
 
-const TOKEN = process.env.TOKEN;
 
 client.once('ready', () => {
     console.log(`Logged in as ${client.user.tag}`);
