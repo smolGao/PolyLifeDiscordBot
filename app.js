@@ -1,84 +1,58 @@
+require('dotenv/config');
+//const express = require('express');
+
+// Load environment variables from .env file
 require('dotenv').config();
-const getLCUserProfile = require('./External Feature/leetcode.js');
-const fs = require('node:fs');
-const path = require('node:path');
-const { Client, Collection, Events, GatewayIntentBits } = require('discord.js');
+const token = process.env.DISCORD_TOKEN;
 
-const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent] });
-client.commands = new Collection();
+// Require the necessary discord.js classes
+const { Client, Events, GatewayIntentBits } = require('discord.js');
 
-const foldersPath = path.join(__dirname, 'commands');
-const commandFolders = fs.readdirSync(foldersPath);
+// Create an express app
+//const app = express();
 
-for (const folder of commandFolders) {
-	const commandsPath = path.join(foldersPath, folder);
-	const commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('.js'));
-	for (const file of commandFiles) {
-		const filePath = path.join(commandsPath, file);
-		const command = require(filePath);
-		// Set a new item in the Collection with the key as the command name and the value as the exported module
-		if ('data' in command && 'execute' in command) {
-			client.commands.set(command.data.name, command);
-		} else {
-			console.log(`[WARNING] The command at ${filePath} is missing a required "data" or "execute" property.`);
-		}
-	}
-}
+// Get port, or default to 3000
+const PORT = process.env.PORT || 3000;
 
-const TOKEN = process.env.TOKEN;
+// Create a new client instance
+const client = new Client({ 
+    intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent] 
+});
 
-client.once('ready', () => {
-    console.log(`Logged in as ${client.user.tag}`);
+// When the client is ready, run this code (only once).
+// The distinction between `client: Client<boolean>` and `readyClient: Client<true>` is important for TypeScript developers.
+// It makes some properties non-nullable.
+client.once(Events.ClientReady, readyClient => {
+	console.log(`Ready! Logged in as ${readyClient.user.tag}`);
 });
 
 
-client.on(Events.InteractionCreate, async interaction => {
-	if (!interaction.isChatInputCommand()) return;
+/* divide line */
 
-	const command = interaction.client.commands.get(interaction.commandName);
-
-	if (!command) {
-		console.error(`No command matching ${interaction.commandName} was found.`);
-		return;
-	}
-
-	try {
-		await command.execute(interaction);
-	} catch (error) {
-		console.error(error);
-		if (interaction.replied || interaction.deferred) {
-			await interaction.followUp({ content: 'There was an error while executing this command!', ephemeral: true });
-		} else {
-			await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
-		}
-	}
+client.on('ready', () => {
+    console.log(`Logged in as ${client.user.tag}!`);
 });
 
 client.on('messageCreate', async message => {
-    if (message.author.bot || !message.content.startsWith('!')) return;
+    if (message.author.bot) return;
 
-    console.log("msg: " + message.content)
+    const userMessage = message.content;
 
-    // Extract the command and arguments from the message
-    const [command, ...args] = message.content.slice(1).trim().split(/\s+/);
-
-    // Check if the command is '!leetcode' followed by a username
-    if (command === 'leetcode' && args.length === 1) {
-        const username = args[0];
-        // Call your function with the username
-        message.channel.send(`Fetching data ...`);
-        const res = await getLCUserProfile(username);
-        const resStr =
-            'User: ' + username + '\n' +
-            'Total solved questions: ' + (res.numEasySolved + res.numMediumSolved + res.numHardSolved) + '\n' +
-            'Easy Problems Solved: ' + res.numEasySolved + '\n' +
-            'Medium Problems Solved: ' + res.numMediumSolved + '\n' +
-            'Hard Problems Solved: ' + res.numHardSolved + '\n' +
-            'Acceptance Rate: ' + res.acceptanceRate + '%';
-
-        message.channel.send(resStr);
+    if (userMessage === '!hello') {
+        message.channel.send('hello world');
+    } else if (userMessage === '!ping') {
+        try {
+            // Simulating a success scenario
+            // In real use, you can check some actual bot operation status
+            message.channel.send('discord bot fully operational');
+        } catch (error) {
+            message.channel.send('discord bot errors out');
+        }
+    } else if (userMessage === '!host') {
+        const userName = message.author.username;
+        message.channel.send(`${userName} is hosting a game!`);
     }
 });
 
-client.login(TOKEN)
-    .catch(console.error); // Error handling for login
+// Log in to Discord with your client's token
+client.login(token);

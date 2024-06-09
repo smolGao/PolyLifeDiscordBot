@@ -1,3 +1,8 @@
+/*
+    Only add method is available because currently we do not need to modify the board
+*/
+
+
 export class CircularLinkedList{
     constructor(){
         this.head = null;
@@ -5,27 +10,30 @@ export class CircularLinkedList{
         this.size = 0;
     }
 
-    add(node){
+    add(val){
         if(size == 0){
+            var node = new Node(val, node, node);
             this.head = node;
             this.tail = node;
-            this.tail.next = head;
         }else if(size == 1){
+            var node = new Node(val, head, head);
+            this.tail = node;
             this.head.next = tail;
-            this.tail = node;
-            this.tail.next = head; 
+            this.head.prev = tail;
         }else{
-            this.tail.next = node;
+            var node = new Node(val, tail, head);
+            this.tail.next = node;  //old tail.next = node
             this.tail = node;
-            this.tail.next = head;
+            this.head.prev = tail;  //make head.prev points to new tail
         }
         this.size++;
     }
 }
 
 export class Node{
-    constructor(val){
+    constructor(val, prev, next){
         this.val = val;
-        this.next = null;
+        this.prev = prev;
+        this.next = next;
     }
 }
