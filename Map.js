@@ -5,14 +5,14 @@ class Map {
     }
 
     add(name) {
-        const newLand = new Land(name);
+        const newProperty = new Property(name);
         if (!this.head) {
-            this.head = newLand;
-            this.tail = newLand;
-            newLand.next = this.head;  // Point to itself, creating a circular reference
+            this.head = newProperty;
+            this.tail = newProperty;
+            newProperty.next = this.head;  // Point to itself, creating a circular reference
         } else {
-            this.tail.next = newLand;
-            this.tail = newLand;
+            this.tail.next = newProperty;
+            this.tail = newProperty;
             this.tail.next = this.head;  // Ensure the tail points back to the head
         }
     }
@@ -57,19 +57,3 @@ class Map {
 }
 
 
-class Land {
-    constructor (name) {
-        this.name;
-        this.price;
-        this.tax;
-        this.house;
-        this.event;
-        this.owner;
-        this.mortgage;
-
-        // Linked list attributes
-        this.prev;
-        this.next;
-        
-    }   
-}
