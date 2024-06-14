@@ -1,31 +1,21 @@
-class Railroad {
-    constructor(name, cost) {
-        this.name = name;
-        this.cost = cost;
-        this.owner = null;
-        this.mortgaged = false;
+import Property from './property';
+
+class Railroad extends Property {
+    constructor(name) {
+        super(name, 200, 0); // Initial rent is set to 0, we'll calculate rent based on the number of railroads owned
     }
 
-    getRent(numOwned) {
+    getRent() {
         const rents = [25, 50, 100, 200];
+        const numOwned = this.owner.properties.filter(prop => prop instanceof Railroad).length;
         return rents[numOwned - 1];
-    }
-
-    purchase(player) {
-        if (this.owner !== null) {
-            throw new Error('Railroad is already owned');
-        }
-        this.owner = player;
-        player.adjustMoney(-this.cost);
-        player.properties.push(this);
     }
 
     payRent(player) {
         if (this.owner === null) {
             throw new Error('Railroad is not owned by anyone');
         }
-        const numOwned = this.owner.properties.filter(prop => prop instanceof Railroad).length;
-        const rent = this.getRent(numOwned);
+        const rent = this.getRent();
         if (player.money < rent) {
             throw new Error(`${player.name} cannot afford the rent`);
         }
@@ -33,28 +23,8 @@ class Railroad {
         this.owner.adjustMoney(rent);
     }
 
-    mortgage() {
-        if (this.mortgaged) {
-            throw new Error('Railroad is already mortgaged');
-        }
-        this.mortgaged = true;
-        this.owner.adjustMoney(this.cost / 2);
-    }
-
-    liftMortgage() {
-        if (!this.mortgaged) {
-            throw new Error('Railroad is not mortgaged');
-        }
-        const mortgageLiftCost = this.cost / 2 * 1.1;
-        if (this.owner.money < mortgageLiftCost) {
-            throw new Error(`${this.owner.name} cannot afford to lift the mortgage`);
-        }
-        this.owner.adjustMoney(-mortgageLiftCost);
-        this.mortgaged = false;
-    }
-
     toString() {
-        return `${this.name} - Cost: $${this.cost}, Owner: ${this.owner ? this.owner.name : 'None'}, Mortgaged: ${this.mortgaged}`;
+        return `${this.name} - Cost: $${this.cost}, Rent: $${this.getRent()}, Owner: ${this.owner ? this.owner.name : 'None'}, Mortgaged: ${this.mortgaged}`;
     }
 }
 
