@@ -1,4 +1,4 @@
-import SpecialSpace from './SpecialBlock';
+import SpecialBlock from './SpecialBlock';
 
 class Chance extends SpecialBlock {
     constructor() {
