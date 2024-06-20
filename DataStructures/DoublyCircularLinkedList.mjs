@@ -3,7 +3,7 @@
 */
 
 
-export class CircularLinkedList{
+export class DoublyCircularLinkedList{
     constructor(){
         this.head = null;
         this.tail = null;
