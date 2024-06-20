@@ -28,6 +28,9 @@ client.once(Events.ClientReady, readyClient => {
 
 
 /* divide line */
+/* variables */
+let currentHost = null;
+let players = [];
 
 client.on('ready', () => {
     console.log(`Logged in as ${client.user.tag}!`);
@@ -49,8 +52,29 @@ client.on('messageCreate', async message => {
             message.channel.send('discord bot errors out');
         }
     } else if (userMessage === '!host') {
-        const userName = message.author.username;
-        message.channel.send(`${userName} is hosting a game!`);
+        if (currentHost) {
+            message.channel.send(`A game is already being hosted by ${currentHost.username}.`);
+        } else {
+            currentHost = message.author;
+            players = [currentHost];
+            message.channel.send(`${currentHost.username} is hosting a game! Type !join to participate.`);
+        }
+    } else if (userMessage === '!join') {
+        if (!currentHost) {
+            message.channel.send(`No game is currently being hosted. Type !host to start a game.`);
+        } else if (players.includes(message.author)) {
+            message.channel.send(`You have already joined the game, ${message.author.username}.`);
+        } else {
+            players.push(message.author);
+            message.channel.send(`${message.author.username} has joined. There are now ${players.length} players.`);
+        }
+    } else if (userMessage === '!players') {
+        if (!currentHost) {
+            message.channel.send(`No game is currently being hosted.`);
+        } else {
+            const playerList = players.map(player => player.username).join(', ');
+            message.channel.send(`Current players: ${playerList}`);
+        }
     }
 });
 
