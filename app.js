@@ -1,8 +1,9 @@
 require('dotenv').config();
-const getLCUserProfile = require('./External Feature/leetcode.js');
-const fs = require('node:fs');
-const path = require('node:path');
-const { Client, Collection, Events, GatewayIntentBits } = require('discord.js');
+import getLCUserProfile from './External Feature/leetcode.js';
+import { readdirSync } from 'node:fs';
+import { join } from 'node:path';
+import { Client, Collection, Events, GatewayIntentBits } from 'discord.js';
+import {Card} from './Event/Card.js'
 
 const TOKEN = process.env.TOKEN;
 
@@ -10,14 +11,14 @@ const TOKEN = process.env.TOKEN;
 const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent] });
 client.commands = new Collection();
 
-const foldersPath = path.join(__dirname, 'commands');
-const commandFolders = fs.readdirSync(foldersPath);
+const foldersPath = join(__dirname, 'commands');
+const commandFolders = readdirSync(foldersPath);
 
 for (const folder of commandFolders) {
-	const commandsPath = path.join(foldersPath, folder);
-	const commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('.js'));
+	const commandsPath = join(foldersPath, folder);
+	const commandFiles = readdirSync(commandsPath).filter(file => file.endsWith('.js'));
 	for (const file of commandFiles) {
-		const filePath = path.join(commandsPath, file);
+		const filePath = join(commandsPath, file);
 		const command = require(filePath);
 		// Set a new item in the Collection with the key as the command name and the value as the exported module
 		if ('data' in command && 'execute' in command) {
@@ -27,6 +28,22 @@ for (const folder of commandFolders) {
 		}
 	}
 }
+
+const communityChestCards = [
+    new Card('Advance to Go (Collect $200)', (player) => { player.position = 0; player.adjustMoney(200); }),
+    new Card('Bank error in your favor – Collect $200', (player) => { player.adjustMoney(200); }),
+];
+
+const chanceCards = [
+    new Card('Advance to Go (Collect $200)', (player) => { player.position = 0; player.adjustMoney(200); }),
+    new Card('Go to Jail – Go directly to Jail – Do not pass Go, do not collect $200', (player) => { player.position = 10; player.inJail = true; }),
+];
+
+// Create decks
+const communityChestDeck = new Deck(communityChestCards);
+const chanceDeck = new Deck(chanceCards);
+
+let game = null;
 
 
 client.once('ready', () => {
