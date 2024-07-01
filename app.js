@@ -5,6 +5,12 @@ import { join } from 'node:path';
 import { Client, Collection, Events, GatewayIntentBits } from 'discord.js';
 import {Card} from './Event/Card.js'
 
+const Player = require('./Asset/Player.js');
+const Board = require('./Asset/Board.js');
+const Card = require('./Event/Card.js');
+const Deck = require('./Event/Deck.js');
+const Game = require('./Game.js');
+
 const TOKEN = process.env.TOKEN;
 
 
