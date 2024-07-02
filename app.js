@@ -57,6 +57,53 @@ client.once('ready', () => {
 });
 
 
+// Command to start a new game
+client.on('messageCreate', message => {
+    if (message.content === '!startgame') {
+        if (game) {
+            message.channel.send('A game is already in progress!');
+            return;
+        }
+
+        const players = [
+            new Player('Player 1'),
+            new Player('Player 2'),
+        ];
+
+        const board = new Board();
+        game = new Game(players, board, communityChestDeck, chanceDeck);
+
+        message.channel.send('Game started! Use !nextturn to proceed.');
+    } else if (message.content === '!nextturn') {
+        if (!game) {
+            message.channel.send('No game in progress. Use !startgame to start a new game.');
+            return;
+        }
+
+        game.nextTurn();
+        message.channel.send(`It's now ${game.players[game.currentPlayerIndex].name}'s turn.`);
+    }
+});
+
+// Command to add a player
+client.on('messageCreate', message => {
+    if (message.content.startsWith('!addplayer')) {
+        if (!game) {
+            message.channel.send('No game in progress. Use !startgame to start a new game.');
+            return;
+        }
+
+        const playerName = message.content.split(' ')[1];
+        if (!playerName) {
+            message.channel.send('Please provide a player name.');
+            return;
+        }
+
+        game.players.push(new Player(playerName));
+        message.channel.send(`${playerName} has been added to the game.`);
+    }
+});
+
 client.on(Events.InteractionCreate, async interaction => {
 	if (!interaction.isChatInputCommand()) return;
 
