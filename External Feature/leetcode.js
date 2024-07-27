@@ -68,4 +68,4 @@ async function getLCUserProfile(username) {
     return res;
 }
 
-module.exports = getLCUserProfile;
+export default getLCUserProfile;

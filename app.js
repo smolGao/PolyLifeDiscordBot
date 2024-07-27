@@ -1,15 +1,21 @@
-require('dotenv').config();
+import dotenv from 'dotenv';
 import getLCUserProfile from './External Feature/leetcode.js';
 import { readdirSync } from 'node:fs';
 import { join } from 'node:path';
 import { Client, Collection, Events, GatewayIntentBits } from 'discord.js';
-import {Card} from './Event/Card.js'
+import Card from './Event/Card.js'
 
-const Player = require('./Asset/Player.js');
-const Board = require('./Asset/Board.js');
-const Card = require('./Event/Card.js');
-const Deck = require('./Event/Deck.js');
-const Game = require('./Game.js');
+import path from 'path';
+import { fileURLToPath, pathToFileURL } from 'url';
+
+
+
+dotenv.config();
+
+import Player from './Asset/Player.js';
+import Board from './Asset/Board.js';
+import Deck from './Event/Deck.js';
+import Game from './Game.js';
 
 const TOKEN = process.env.TOKEN;
 
@@ -17,23 +23,39 @@ const TOKEN = process.env.TOKEN;
 const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent] });
 client.commands = new Collection();
 
-const foldersPath = join(__dirname, 'commands');
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const foldersPath = path.join(__dirname, 'commands');
 const commandFolders = readdirSync(foldersPath);
 
-for (const folder of commandFolders) {
-	const commandsPath = join(foldersPath, folder);
-	const commandFiles = readdirSync(commandsPath).filter(file => file.endsWith('.js'));
-	for (const file of commandFiles) {
-		const filePath = join(commandsPath, file);
-		const command = require(filePath);
-		// Set a new item in the Collection with the key as the command name and the value as the exported module
-		if ('data' in command && 'execute' in command) {
-			client.commands.set(command.data.name, command);
-		} else {
-			console.log(`[WARNING] The command at ${filePath} is missing a required "data" or "execute" property.`);
-		}
-	}
+async function loadCommands() {
+    for (const folder of commandFolders) {
+        const commandsPath = path.join(foldersPath, folder);
+        const commandFiles = readdirSync(commandsPath).filter(file => file.endsWith('.js'));
+        for (const file of commandFiles) {
+            const filePath = path.join(commandsPath, file);
+            try {
+                const fileUrl = pathToFileURL(filePath).href;
+                const commandModule = await import(fileUrl);
+                const command = commandModule.default; 
+                // Set a new item in the Collection with the key as the command name and the value as the exported module
+                if ('data' in command && 'execute' in command) {
+                    client.commands.set(command.data.name, command);
+                } else {
+                    console.log(`[WARNING] The command at ${filePath} is missing a required "data" or "execute" property.`);
+                }
+            } catch (err) {
+                console.error(`Failed to load command at ${filePath}:`, err);
+            }
+        }
+    }
 }
+
+loadCommands().then(() => {
+    console.log('Commands loaded successfully');
+}).catch(err => {
+    console.error('Error loading commands:', err);
+});
 
 const communityChestCards = [
     new Card('Advance to Go (Collect $200)', (player) => { player.position = 0; player.adjustMoney(200); }),
